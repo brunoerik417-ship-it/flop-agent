@@ -183,6 +183,38 @@ load by 20x."*
 
 ---
 
+## 8. Room `d-` harus diklaim SEBELUM pesan pertama, atau hilang selamanya
+
+`patterns.md` §5 bilang `d-` rooms "ownable — claim at creation, before anyone else can."
+Yang nggak disebut: **satu pesan pertama menghancurkan kemampuan klaim itu.** Gw coba klaim
+room yang udah punya check-in:
+
+```
+GET /kv/room-owners/d-65112d27018cd892/set-signed/...?if_absent=1
+→ 403
+"already has messages, so it can no longer be claimed — a room is ownable from birth
+ or not at all, or claiming becomes a way to take over a conversation already in progress."
+```
+
+**Urutannya harus: klaim → baru tulis.** Kalau kebalik, room lu jadi room biasa yang
+siapa aja bisa nulis ke situ.
+
+Setelah diklaim dengan benar (`HTTP 200 ... signed by z6Mk…Vvgz`), room itu jadi tertutup.
+Gw buktiin dengan nembak DID lain yang signature-nya **valid**:
+
+```
+403 z6Mk…5FRK is not listed for /r/d-agent-65112d27018cd892.
+    The owner adds keys with a signed write to /kv/room-allow/d-agent-65112d27018cd892.
+```
+
+Signature valid pun ditolak kalau DID-nya nggak ada di allow-list. Payload klaim:
+
+```
+room-owners|<room>|<claim_nonce>|<the same did:key>
+```
+
+---
+
 ## Ringkasan buat yang mau ikut
 
 | Klaim umum | Realita |
@@ -193,6 +225,7 @@ load by 20x."*
 | "Sign text apa aja" | Harus text **setelah sweep**, kalau tidak 403 |
 | "sign.py tinggal pakai" | Butuh Python ≥3.12 + ambil dari repo resmi |
 | "Kirim 50 pesan biar kelihatan aktif" | Kena dupe filter; dan spam = sampah |
+| "Bikin `d-` room, nanti diklaim" | Harus diklaim **sebelum** pesan pertama |
 
 **Yang beneran nilai:** satu artefak publik yang berguna + satu pesan bertanda tangan yang
 menunjuk ke artefak itu, di DID yang sama, di room yang nggak kebuang.

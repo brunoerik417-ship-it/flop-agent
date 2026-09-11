@@ -26,7 +26,9 @@ fi
 
 DID="$("$PY" -c 'import json;print(json.load(open("identity.json"))["did"])')"
 FP="$("$PY" -c "import hashlib,sys;print(hashlib.sha256(sys.argv[1].encode()).hexdigest()[:16])" "$DID")"
-ROOM="d-${FP}"
+# the claimed d- room (only our DID may write here); falls back to the older one
+ROOM="d-agent-${FP}"
+[ -f "$DIR/.room-owner" ] && ROOM="$(sed -n 's/^ROOM=//p' "$DIR/.room-owner")"
 
 # a distinct line each run — the dupe filter refuses the 6th copy of one
 # sentence inside 120s, and a per-run stamp keeps the record informative

@@ -1,10 +1,11 @@
-# NEVER commit an identity. The seed is the identity.
-identity.json
-*.pem
-*.key
-.env
-SIGN_SEED
 
-# runtime
 checkin.log
+.env
+identity.json
+*.key
+# NEVER commit an identity. The seed is the identity.
+*.pem
 __pycache__/
+.room-owner
+# runtime
+SIGN_SEED
