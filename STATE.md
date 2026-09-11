@@ -126,6 +126,69 @@ Yang `content`-nya **nggak kosong** → itu yang dipakai.
 - Arthur Hayes konfirmasi **anti-sybil clustering** bakal filter bot repetitif
 - **Belum ada** aturan resmi, snapshot date, atau claim page
 
+## 🚫 JANGAN BIKIN DID KEDUA — ada bukti publik
+
+Issue **flop-labs/technocore-chat#149** (public, dibaca Flop Labs) melaporkan pola farming
+di room `/r/technocore`. Temuan dari 200 record terbaru:
+
+```
+Signed (did:key)          : 199/200
+DID berbeda dalam window  : 121
+Pakai 2 template identik  : 160/200 (80%)
+DID yang cuma nulis 1x    : 42/121
+```
+
+> *"78 DIDs post both — so the unit of activity is a freshly-minted key that writes
+> one pair and is not seen again. Nonces are nanosecond wall-clock timestamps clustered
+> within seconds of each other across different DIDs, which is what one script driving
+> many identities concurrently looks like."*
+
+Laporan itu juga nemu **fabrikasi bukti**: template kedua menempelkan URL GitHub
+sembarang (issue di `apache/texera`, `scala/scala3`, `guardian/frontend`, dll) sebagai
+"bukti kontribusi" — padahal issue itu nggak ada hubungannya sama technocore. 79 link,
+46 repo, dicek 30: **nol** yang relevan.
+
+> *"The fabrication is the pairing, not the link."*
+
+### Konsekuensi praktis
+
+- ❌ **Jangan** mint DID baru dengan seed baru buat "nambah peluang". 1 operator = 1 DID.
+  DID ganda = profil sybil, bisa didiskualifikasi.
+- ❌ **Jangan** tempel URL pihak ketiga sebagai bukti kontribusi.
+- ✅ Kontribusi harus **artefak sendiri**, bisa diverifikasi. `flop-agent` memenuhi ini —
+  repo kita sendiri, isinya bisa direproduksi dengan `curl`.
+- ✅ Jejak yang benar = **1 DID, konsisten, jangka panjang** (cron check-in 6 jam).
+
+## 💡 Kontes resmi: `sonnet-2` — DID kita KETINGGALAN CUTOFF
+
+**flop-labs/technocore-sonnet-challenge** — kontes puisi sonnet, hadiah **50.000 FLOP**
++ voter pool 50.000 FLOP. Tutup 2026-09-18.
+
+Syarat eligibility (dari `sonnet-game.md`):
+
+> *"the referee must verify a message signed by the same Ed25519 DID in trusted
+> Technocore archive records with a server receipt timestamp **strictly before S**"*
+> *"An identity first evidenced at S or later ... cannot join a writing roster,
+> submit words, vote or claim a participant prize."*
+
+`S = 2026-09-11T12:00:00Z`. DID kita lahir **20:04 UTC** — lewat **8 jam 4 menit**.
+Bukti harus timestamp server dari referee, bukan klaim tanggal.
+
+**Boleh daftar sebagai organizer** (nggak butuh bukti umur), tapi organizer **nggak dapet
+hadiah** (`no separate contest prize`).
+
+### Yang bikin ini tetap berguna
+
+Cutoff itu **memfilter bot yang baru daftar**. Sekarang DID kita udah punya jejak archive
+dengan timestamp server (cron check-in tiap 6 jam). Artinya:
+
+> **DID kita sekarang "predate" SEMUA kontes Flop Labs yang dibuka berikutnya.**
+
+Yang tadi bikin gagal, sekarang jadi aset. Cukup **jaga cron jalan** — tiap 6 jam jadi
+bukti umur yang sah.
+
+Pelajaran: **buat DID sedini mungkin**, karena umur DID = tiket masuk kontes berikutnya.
+
 ## 🛡️ Aturan keamanan (JANGAN dilanggar)
 
 - ❌ Jangan pernah share `identity.json` / seed-nya
@@ -133,3 +196,4 @@ Yang `content`-nya **nggak kosong** → itu yang dipakai.
 - ❌ Jangan commit `identity.json`, `*.pem`, `*.key`, `.env`
 - ❌ Jangan pakai seed wallet/exchange sebagai seed DID
 - ⚠️ Siapapun yang minta seed = scammer, termasuk yang ngaku "support"
+- ❌ **Jangan bikin DID kedua** — 1 operator = 1 DID (bukti: issue #149 di atas)
