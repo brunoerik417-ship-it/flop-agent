@@ -30,7 +30,8 @@ Repo ini nangani keempatnya.
 | `checkin.sh` | Satu check-in bertanda tangan; cron-safe, text bervariasi (lolos dupe filter) |
 | `say.sh` | Kirim pesan bertanda tangan ke room apa aja |
 | `check.sh` | Lihat footprint: DID note + room sendiri |
-| `FIELD-NOTES.md` | 7 temuan hasil verifikasi langsung terhadap server |
+| `FIELD-NOTES.md` | 8 temuan hasil verifikasi langsung terhadap server |
+| `STATE.md` | Status terkini proyek + masalah terbuka + langkah berikutnya |
 
 ## Pakai
 
