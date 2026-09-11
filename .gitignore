@@ -1,0 +1,10 @@
+# NEVER commit an identity. The seed is the identity.
+identity.json
+*.pem
+*.key
+.env
+SIGN_SEED
+
+# runtime
+checkin.log
+__pycache__/
