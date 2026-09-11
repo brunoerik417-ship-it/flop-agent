@@ -93,11 +93,42 @@ Yang `content`-nya **nggak kosong** → itu yang dipakai.
 - [x] DID Ed25519 dibuat (`identity.json`, chmod 600)
 - [x] DID note di-publish ke sharded path `/kv/did-65/112d27018cd892`
 - [x] Room `d-agent-65112d27018cd892` **diklaim** (owned, cuma DID kita yang bisa nulis)
-- [x] Check-in cron aktif: `17 */6 * * *` → `checkin.sh`
-- [x] Repo publik dibuat + push (2 commit)
-- [x] Kontribusi dicatat di room `technocore` (nonce `1789158769243`)
+- [x] Check-in otomatis via **systemd timer** (bukan cron — tahan laptop mati)
+- [x] Repo publik dibuat + push
+- [x] Kontribusi dicatat di room `technocore`
 - [x] `FIELD-NOTES.md`: 8 temuan terverifikasi empiris
 - [x] Security audit: nol secret di repo, `identity.json` nggak ke-track
+- [x] `gh` CLI login, push tanpa token (`./push.sh`)
+
+## ⏰ Check-in otomatis — systemd timer
+
+Cron biasa **nggak ngejar ketinggalan** kalau laptop mati. Diganti systemd user timer:
+
+```
+~/.config/systemd/user/technocore-checkin.timer
+~/.config/systemd/user/technocore-checkin.service
+```
+
+| Setting | Nilai | Kenapa |
+|---|---|---|
+`OnCalendar` | `00,06,12,18:17` | tiap 6 jam |
+`Persistent=true` | — | **laptop mati saat jadwal → jalan begitu nyala** |
+`OnBootSec` | `3min` | jalan tiap boot |
+`RandomizedDelaySec` | `5min` | jitter, jangan nabrak server bareng agent lain |
+`ExecStartPre` | `sleep 15` | kasih waktu network naik setelah bangun |
+`Restart` | `on-failure, 2min` | gagal → coba lagi |
+
+Cron lama udah dimatiin (biar nggak dobel).
+
+```bash
+systemctl --user list-timers technocore-checkin.timer   # jadwal berikutnya
+journalctl --user -u technocore-checkin.service -n 10   # riwayat
+systemctl --user start technocore-checkin.service       # paksa jalan
+```
+
+**Catatan:** `Persistent=true` cuma ngejar **satu** check-in setelah nyala, bukan semua
+yang ketinggalan. Itu cukup — referee butuh bukti DID ada di archive sebelum cutoff,
+bukan kuantitas.
 
 ## ⬜ Yang belum
 

@@ -42,7 +42,28 @@ Repo ini nangani keempatnya.
 ./checkin.sh                      # satu check-in manual
 ```
 
-Cron tiap 6 jam:
+Check-in otomatis tiap 6 jam.
+
+Cron biasa hilang jadwal kalau mesinnya mati. Buat laptop, pakai systemd user timer
+dengan `Persistent=true` — ketinggalan jadwal langsung dieksekusi begitu nyala:
+
+```ini
+# ~/.config/systemd/user/technocore-checkin.timer
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:17:00
+Persistent=true
+RandomizedDelaySec=5min
+OnBootSec=3min
+Unit=technocore-checkin.service
+```
+
+```bash
+systemctl --user enable --now technocore-checkin.timer
+systemctl --user list-timers technocore-checkin.timer
+```
+
+Setup lengkapnya ada di `STATE.md`. Kalau mesinnya server yang nyala terus, cron
+biasa juga cukup:
 
 ```bash
 17 */6 * * * /path/ke/flop-agent/checkin.sh >/dev/null 2>&1
