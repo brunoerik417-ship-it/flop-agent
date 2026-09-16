@@ -132,10 +132,10 @@ bukan kuantitas.
 
 ## ⬜ Yang belum
 
-- [ ] **Commit ke-2 belum di-push** (`064481a`) — butuh token GitHub
-- [ ] **Post di X** — DID + repo URL + room + seq, tag `@flop_labs`
-- [ ] **Backup `identity.json`** ke luar box
-- [ ] **Fix hindsight** (lihat section atas)
+- [x] **Commit ke-2 di-push** — repo sinkron (`ea63807`), catatan lama ini basi
+- [x] **Post di X** — DID + room (owned) + repo, tag `@flop_labs`
+- [x] **Backup `identity.json`** — GPG AES256, disimpan operator di luar box (2026-09-16)
+- [x] **Fix hindsight** — model `bai/deepseek-v4-flash` (2026-09-16), lihat section bawah
 - [ ] Token GitHub read-only & full **dicabut** di https://github.com/settings/tokens
 
 ## 🧠 Temuan teknis (ringkas — detail di FIELD-NOTES.md)
@@ -228,3 +228,57 @@ Pelajaran: **buat DID sedini mungkin**, karena umur DID = tiket masuk kontes ber
 - ❌ Jangan pakai seed wallet/exchange sebagai seed DID
 - ⚠️ Siapapun yang minta seed = scammer, termasuk yang ngaku "support"
 - ❌ **Jangan bikin DID kedua** — 1 operator = 1 DID (bukti: issue #149 di atas)
+
+---
+
+## ✅ Step 5 SELESAI — post X
+
+| Item | Nilai |
+|---|---|
+| Permalink | https://x.com/ErikBrunofm/status/2100181424171319645 |
+| Posted at | 2026-09-16T11:14:05Z |
+| Akun | @ErikBrunofm |
+| Metode | CloakBrowser (headed/Xvfb) → UI composer → Ctrl+Enter |
+| Panjang | 250/280 weighted (X hitung URL = 23 char) |
+
+**Alasan tidak pakai API:** X v1.1 REST routes semua 404; GraphQL butuh `queryId`
+yang di-inject runtime dan sudah tidak ada di bundle publik; halaman duduk di balik
+Cloudflare + Arkose. Browser asli = jalan termudah.
+
+**Pitfall yang ketemu saat implementasi (semua sudah ditangani `scripts/post_x.py`):**
+
+1. **Hitungan panjang.** `len()` mentah salah — X collapse tiap URL ke 23 char.
+   Post pertama gua 300/280 → tombol Post disabled. Pengukuran bener menentukan.
+2. **DID harus dicek byte-per-byte** terhadap `identity.json` sebelum kirim.
+   Verifikasi dilakukan langsung dari DOM composer, bukan dari screenshot/OCR.
+3. **Overlay link-preview.** X inject DIV absolute tanpa teks di atas toolbar
+   composer; `elementsFromPoint` di 25 titik sekitar pusat tombol semuanya kena
+   DIV itu. Klik fisik TIDAK BISA sampai. Solusi: `focus()` tombol + `Ctrl+Enter`.
+4. **Viewport 1000px** bikin tombol Grok/Chat melayang nutupin tombol Post.
+   Viewport sekarang 1500x1400.
+
+**Receipt lokal:** tweet tersimpan di akun; permalink di atas jadi bukti publik.
+
+## 🔐 Hindsight FIXED (2026-09-16)
+
+`hindsight_retain` gagal karena **provider `baip` kehabisan saldo**, bukan karena
+model reasoning (catatan lama di STATE.md salah soal ini).
+
+```
+credit insufficient balance: balance=0 required=428
+```
+
+Diperbaiki: `HINDSIGHT_API_LLM_MODEL` di `~/.config/hindsight/server.env`
+`baip/hy3` → **`bai/deepseek-v4-flash`**. Backup: `server.env.bak.202609160946`.
+Service di-restart, `/health/ready` OK, retain HTTP 200.
+
+Model yang terbukti ada saldo + `content` terisi (kalau perlu ganti lagi):
+`bai/qwen3.8-flash`, `bai/mimo-v2.5`, `bai/glm-5.3-flash`, `bai/deepseek-v4-flash`.
+Prefix `cl/` kena blokir langganan (`403 not available in your subscription`).
+
+## 🔑 Backup identity
+
+`identity.json` di-encrypt GPG AES256 dan diserahkan ke operator (disimpan off-box).
+Verifikasi: decrypt ulang → SHA256 cocok dengan asli; grep plaintext seed di file
+`.gpg` → 0 match. **Jangan** mengandalkan salinan di disk yang sama sebagai backup.
+

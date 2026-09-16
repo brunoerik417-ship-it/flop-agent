@@ -9,3 +9,7 @@ __pycache__/
 .room-owner
 # runtime
 SIGN_SEED
+
+# X operator session — NEVER commit
+cookies.txt
+.x/
