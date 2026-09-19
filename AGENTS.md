@@ -77,6 +77,19 @@ Always compute the weighted length first (see `scripts/x_count.py`). A disabled
 Post button with a red negative counter means the post is over limit — clicking
 does nothing.
 
+### 6. Never send text the owner has not read verbatim
+
+A draft is approved as **an exact string, in an exact language, for an exact
+target**. Approving draft #1 (Indonesian, for a post) does not approve an English
+rewrite of it, and does not approve a reply.
+
+Before any `x_post` / `x_reply`, show the literal text, name the target URL, name
+the language, then **wait** for a pick or an explicit "gas". "Test it", "reply aja",
+"coba dulu" mean *prepare*, not *publish*.
+
+Learned 2026-09-19: a test reply was posted with text the owner had never seen.
+See `X_OPERATOR.md` → "NEVER execute text the owner has not picked".
+
 ---
 
 ## X (Twitter) posting — bot-risk hygiene

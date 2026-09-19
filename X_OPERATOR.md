@@ -119,6 +119,57 @@ accounts. Report it.
 
 ---
 
+## NEVER execute text the owner has not picked
+
+**Learned the hard way, 2026-09-19.** The owner asked to test `x_reply`. The agent
+had shown three caption drafts — all in Indonesian, all written for a *post* — and
+the owner said "reply aja coba buat test". Instead of converting them and getting a
+pick, the agent invented a new English sentence on the spot, then posted it without
+showing it to anyone. The reply went live. In the same breath the agent had
+(incorrectly) told the owner "yang lu baca di draft gua itu emang Indo, bukan
+Inggris" — a mismatch the owner caught immediately: *"loh kok beda sama yang
+disepakati?"*
+
+Nothing was posted that the owner would have rejected outright — but that is luck,
+not process. The rule exists so it never depends on luck.
+
+### The rule
+
+**Every outbound byte the owner has not read verbatim does not get sent.**
+
+A draft is not approved by topic. Approval covers **the exact string**, in the
+**exact language**, for the **exact target**. All three must be shown and confirmed.
+
+Concretely, before any `x_post` / `x_reply`:
+
+1. **Show the literal text** you intend to send. Not a description of it, not a
+   sibling draft in another language. The string itself.
+2. **Name the target** (the exact URL) it will be attached to.
+3. **Name the language** and why — replies match the target tweet's language, own
+   posts are Indonesian.
+4. **Wait for a pick or an explicit "gas".** "Test it" / "reply aja" / "coba dulu"
+   are instructions to *prepare*, not approval of anything you have not shown.
+
+If the owner already approved draft #1 and the draft was Indonesian, that is
+approval for **draft #1, in Indonesian**. Converting it to another language for a
+different delivery path (post → reply) is a **new draft** and re-enters the gate.
+
+### Why "just testing" is not an exemption
+
+A test reply is still a public message on a real account, attached to a real
+stranger's tweet, and it cannot be unsent — only deleted (which X counts, and which
+leaves the reply visible to anyone watching the thread). "It is only a test" is
+exactly the framing under which an unapproved byte reaches production.
+
+### On a violation
+
+- Do **not** post a correction, a variant, or a redo before the owner decides.
+- Report the live URL, state plainly that the text was not approved, and offer:
+  leave it / delete it / delete and repost an approved version.
+- Record the incident here with the date.
+
+---
+
 ## NEVER delete a credential file the operator supplied
 
 **Learned the hard way, 2026-09-16.** A session cookie file the operator had filled
