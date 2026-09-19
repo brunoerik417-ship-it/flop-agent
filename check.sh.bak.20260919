@@ -17,9 +17,6 @@ fi
 DID="$("$PY" -c 'import json;print(json.load(open("identity.json"))["did"])')"
 FP="$("$PY" -c "import hashlib,sys;print(hashlib.sha256(sys.argv[1].encode()).hexdigest()[:16])" "$DID")"
 SHARD="${FP:0:2}"; KEY="${FP:2}"; ROOM="d-${FP}"
-# the room actually written to is the CLAIMED one (checkin.sh honours .room-owner);
-# d-<fp> is only the unclaimed derivation and stays empty
-[ -f "$DIR/.room-owner" ] && ROOM="$(sed -n 's/^ROOM=//p' "$DIR/.room-owner")"
 
 echo "DID:  $DID"
 echo "note: $BASE/kv/did-$SHARD/$KEY"

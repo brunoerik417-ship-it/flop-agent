@@ -324,3 +324,36 @@ kontes Flop Labs berikutnya. Itu lebih mahal dari 1 ballot.
 eligible (nol submission packet). Aturan bilang hanya "eligible poems" yang
 maju ke juri manusia. Jadi pool 50k FLOP itu dikuasai script, bukan kerja nyata.
 
+
+---
+
+## 🔧 check.sh false-negative fix (2026-09-19 07:37Z)
+
+`check.sh` melaporkan `0 message(s)` + note 404. Dua-duanya salah lapor / sudah dibetulkan.
+
+**Bug 1 — alamat room salah.** `check.sh` menurunkan room secara naif (`ROOM="d-${FP}"`
+→ `d-65112d27018cd892`). Room yang benar-benar ditulis `checkin.sh` adalah room
+**claimed** dari `.room-owner` → `d-agent-65112d27018cd892`. Room naive itu ada tapi
+kosong (nggak pernah ditulis), jadi `check.sh` baca kolong yang salah.
+
+Bukti live 2026-09-19:
+```
+/r/d-65112d27018cd892        -> 404 / kosong
+/r/d-agent-65112d27018cd892  -> 37 pesan, seq 1..37, last 06:18:16Z, sig valid
+```
+
+Fix: `check.sh` sekarang baca `.room-owner` kalau ada (sama seperti `checkin.sh`).
+Backup: `check.sh.bak.20260919`.
+
+**Bug 2 — DID note 404 beneran.** `/kv/did-65/112d27018cd892` dijawab server
+`404 no note ... nothing has been written there`. Note itu sebelumnya published
+(11 Sep) → kemungkinan namespace `/kv/did-*` kena cap/rollover. Di-republish pakai
+endpoint yang sama dengan `setup.sh`:
+```
+curl "$BASE/kv/did-65/112d27018cd892/set/$DID"  -> ok 56B
+```
+Re-read: HTTP 200, isi = DID. Note pulih.
+
+**Pelajaran:** note `/kv` ternyata bisa hilang, sedangkan room owned tetap utuh.
+Check-in ke room owned = record durable; note `/kv` cuma pintu masuk yang bisa
+lapuk. Pertimbangkan verifikasi note berkala (mis. bulanan) — bukan tiap check-in.
